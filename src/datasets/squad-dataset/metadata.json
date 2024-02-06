@@ -1,0 +1,1 @@
+{"name": "squad-text-embedding-ada-002", "created_at": "2023-06-29", "documents": 18891, "queries": 0, "source": "https://huggingface.co/datasets/squad", "license": null, "bucket": null, "task": null, "dense_model": {"name": "text-embedding-ada-002", "tokenizer": null, "dimension": 1536}, "sparse_model": null, "description": null, "tags": null, "args": null}

@@ -1,1 +1,4 @@
 .venv/
+.env
+src/datasets/squad-dataset/documents/*.parquet
+src/datasets/squad-dataset/queries/*.parquet
