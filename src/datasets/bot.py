@@ -1,4 +1,6 @@
 import os
+from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.vectorstores import pinecone as lc_pinecone
 from pinecone import Pinecone, PodSpec
 from pinecone_datasets import Dataset
 from dotenv import load_dotenv
@@ -54,3 +56,20 @@ else:
     timed_print(
         f"Index {index!r} contains {index.describe_index_stats().get('total_vector_count', 0)} vectors"
     )
+
+# creating a vector store and querying
+model_name = "text-embedding-ada-002"
+embed = OpenAIEmbeddings(
+    model=model_name,
+    api_key=openai_api_key,
+)
+text_field = "text"
+vectorstore = lc_pinecone.Pinecone(index, embed.embed_query, text_field)
+query = (
+    "when was the college of engineering in the university of Notre Dame established?"
+)
+
+sim_res = vectorstore.similarity_search(
+    query=query, k=3  # our search query  # return 3 most relevant docs
+)
+timed_print(f"similarity search results: {sim_res}")
