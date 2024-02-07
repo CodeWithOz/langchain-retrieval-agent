@@ -1,4 +1,7 @@
 import os
+from langchain.chat_models import ChatOpenAI
+from langchain.chains.conversation.memory import ConversationBufferWindowMemory
+from langchain.chains import RetrievalQA
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import pinecone as lc_pinecone
 from pinecone import Pinecone, PodSpec
@@ -58,9 +61,9 @@ else:
     )
 
 # creating a vector store and querying
-model_name = "text-embedding-ada-002"
+embedding_model_name = "text-embedding-ada-002"
 embed = OpenAIEmbeddings(
-    model=model_name,
+    model=embedding_model_name,
     api_key=openai_api_key,
 )
 text_field = "text"
@@ -73,3 +76,27 @@ sim_res = vectorstore.similarity_search(
     query=query, k=3  # our search query  # return 3 most relevant docs
 )
 timed_print(f"similarity search results: {sim_res}")
+
+# initialize conversational agent
+# chat completion llm
+chat_llm_model_name = "gpt-3.5-turbo"
+llm = ChatOpenAI(
+    openai_api_key=openai_api_key,
+    model_name=chat_llm_model_name,
+    temperature=0.0,
+)
+# conversational memory
+conversation_memory = ConversationBufferWindowMemory(
+    memory_key="chat_history",
+    k=5,
+    return_messages=True,
+)
+# retrieval qa chain
+qa = RetrievalQA.from_chain_type(
+    llm=llm,
+    chain_type="stuff",
+    retriever=vectorstore.as_retriever(),
+)
+
+# get an answer
+qa.run(query)
