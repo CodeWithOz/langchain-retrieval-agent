@@ -3,6 +3,7 @@ import datetime
 from dotenv import load_dotenv
 from pinecone_datasets import load_dataset
 
+
 def get_current_timestamp():
     return datetime.datetime.now(tz=datetime.timezone.utc).strftime("%H:%M:%S")
 
