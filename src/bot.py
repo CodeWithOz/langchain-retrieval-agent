@@ -1,20 +1,19 @@
 import os
-from langchain.chat_models import ChatOpenAI
+from langchain_community.chat_models import ChatOpenAI
 from langchain.chains.conversation.memory import ConversationBufferWindowMemory
 from langchain.chains import RetrievalQA
 from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.vectorstores import pinecone as lc_pinecone
+from langchain_community.vectorstores import pinecone as lc_pinecone
 from pinecone import Pinecone, PodSpec
 from pinecone_datasets import Dataset
 from dotenv import load_dotenv
 import datetime
 
+from datasets import utils as datasets_utils
+
 
 def get_current_timestamp():
     return datetime.datetime.now(tz=datetime.timezone.utc).strftime("%H:%M:%S")
-
-
-load_dotenv()
 
 
 def get_current_timestamp_prefix():
@@ -23,6 +22,9 @@ def get_current_timestamp_prefix():
 
 def timed_print(msg: str):
     print(f"{get_current_timestamp_prefix()}{msg}")
+
+
+load_dotenv()
 
 
 pinecone_api_key = os.getenv("PINECONE_API_KEY")
@@ -48,12 +50,12 @@ timed_print(f"Index stats: {index.describe_index_stats()}")
 if index.describe_index_stats().get("total_vector_count", 0) == 0:
     timed_print(f"Loading squad dataset")
     file_path = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), "squad-dataset"
+        os.path.dirname(os.path.abspath(__file__)), "datasets", "squad-dataset"
     )
     dataset = Dataset.from_path(file_path)
     timed_print(f"Loaded squad dataset")
     timed_print(f"Populating index with dataset")
-    index.upsert_from_dataframe(dataset.documents, batch_size=100)
+    datasets_utils.upsert_dataset_redundantly(dataset, index, 100)
     timed_print(f"Populated index with dataset: {index.describe_index_stats()}")
 else:
     timed_print(
