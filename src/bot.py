@@ -1,8 +1,8 @@
 import os
-from langchain_community.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 from langchain.chains.conversation.memory import ConversationBufferWindowMemory
 from langchain.chains import RetrievalQA
-from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import pinecone as lc_pinecone
 from pinecone import Pinecone, PodSpec
 from pinecone_datasets import Dataset
@@ -69,7 +69,7 @@ embed = OpenAIEmbeddings(
     api_key=openai_api_key,
 )
 text_field = "text"
-vectorstore = lc_pinecone.Pinecone(index, embed.embed_query, text_field)
+vectorstore = lc_pinecone.Pinecone(index, embed, text_field)
 query = (
     "when was the college of engineering in the university of Notre Dame established?"
 )
@@ -101,4 +101,4 @@ qa = RetrievalQA.from_chain_type(
 )
 
 # get an answer
-qa.run(query)
+qa.invoke(query)
