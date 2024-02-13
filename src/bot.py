@@ -1,4 +1,5 @@
 import os
+from langchain.agents import initialize_agent
 from langchain_openai import ChatOpenAI
 from langchain.chains.conversation.memory import ConversationBufferWindowMemory
 from langchain.chains import RetrievalQA
@@ -6,6 +7,7 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import pinecone as lc_pinecone
 from pinecone import Pinecone, PodSpec
 from pinecone_datasets import Dataset
+from langchain.agents import Tool
 from dotenv import load_dotenv
 import datetime
 
@@ -101,4 +103,25 @@ qa = RetrievalQA.from_chain_type(
 )
 
 # get an answer
-qa.invoke(query)
+timed_print(qa.invoke(query))
+
+tools = [
+    Tool(
+        name="Knowledge Base",
+        func=qa.invoke,
+        description=(
+            "use this tool when answering general knowledge queries to get "
+            "more information about the topic"
+        ),
+    )
+]
+
+agent = initialize_agent(
+    agent="chat-conversational-react-description",
+    tools=tools,
+    llm=llm,
+    verbose=True,
+    max_iterations=3,
+    early_stopping_method="generate",
+    memory=conversation_memory,
+)
