@@ -72,14 +72,7 @@ embed = OpenAIEmbeddings(
 )
 text_field = "text"
 vectorstore = lc_pinecone.Pinecone(index, embed, text_field)
-query = (
-    "when was the college of engineering in the university of Notre Dame established?"
-)
-
-sim_res = vectorstore.similarity_search(
-    query=query, k=3  # our search query  # return 3 most relevant docs
-)
-timed_print(f"similarity search results: {sim_res}")
+query = "can you tell me some facts about the University of Notre Dame?"
 
 # initialize conversational agent
 # chat completion llm
@@ -102,9 +95,6 @@ qa = RetrievalQA.from_chain_type(
     retriever=vectorstore.as_retriever(),
 )
 
-# get an answer
-timed_print(qa.invoke(query))
-
 tools = [
     Tool(
         name="Knowledge Base",
@@ -120,8 +110,15 @@ agent = initialize_agent(
     agent="chat-conversational-react-description",
     tools=tools,
     llm=llm,
-    verbose=True,
+    # verbose=True,
     max_iterations=3,
     early_stopping_method="generate",
     memory=conversation_memory,
 )
+
+while query:
+    print(f"You: {query}")
+    print(f"Bot: {agent(query).get('output')}")
+    query = input(
+        "\n\nI am a general knowledge chatbot 🤖, what would you like to know?\n\n> "
+    )
