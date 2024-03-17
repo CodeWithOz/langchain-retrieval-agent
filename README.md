@@ -1,0 +1,2 @@
+### Retrieval-Enhanced Conversational Agent with Memory
+A simple LangChain conversation agent with memory. It retrieves relevant info from a pinecone index to enhance its responses. From the accompanying [pinecone tutorial](https://colab.research.google.com/github/pinecone-io/examples/blob/master/docs/langchain-retrieval-agent.ipynb).
